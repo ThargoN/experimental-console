@@ -21,25 +21,38 @@ namespace Thargon.Experimental_console {
 			Console.WriteLine("Starting console");
 			PrintCurrentThread();
 
-			var t1 = new Task(() => {
-				Console.Write("Task 1 start");
-				PrintCurrentThread();
-				Thread.Sleep(1000);
-				Console.Write("Task 1 end");
-				PrintCurrentThread();
-			});
-			t1.Start();
+			Task.Factory.StartNew(() => DoJob(1, 2500));
+			Task.Factory.StartNew(() => DoJob(2, 750));
+			Task.Factory.StartNew(() => DoJob(3, 3000));
+			Task.Factory.StartNew(() => DoJob(4, 2500));
+			Task.Factory.StartNew(() => DoJob(5, 1000));
 
 			Console.WriteLine("Press any key to exit...");
 			Console.ReadKey(true);
 		}
 
+		static readonly object _mtLock = new object();
+
+		private static void DoJob(int id, int timeToWork) {
+			lock (_mtLock) {
+				Console.WriteLine($"Task {id} start");
+				PrintCurrentThread();
+			}
+
+			Thread.Sleep(timeToWork);
+
+			lock (_mtLock) {
+				Console.WriteLine($"Task {id} end");
+				PrintCurrentThread();
+			}
+		}
+						
 		/// <summary>
-		/// Выводит в текущую строку консоли номер потока.
+		/// Выводит в предыдущую строку консоли номер потока.
 		/// </summary>
 		public static void PrintCurrentThread() {
 			string tStr = new string($"(thread {Thread.CurrentThread.ManagedThreadId:D2})");
-			Console.CursorLeft = Console.WindowWidth - tStr.Length;
+			Console.SetCursorPosition(Console.WindowWidth - tStr.Length, Math.Max(Console.CursorTop - 1, 0));
 			Console.ForegroundColor = ConsoleColor.DarkBlue;
 			Console.WriteLine(tStr);
 			Console.ResetColor();
