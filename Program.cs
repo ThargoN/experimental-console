@@ -18,15 +18,31 @@ namespace Thargon.Experimental_console {
 
 	class Program {
 		static void Main() {
+			Console.WriteLine("Starting console");
+			PrintCurrentThread();
+
 			var t1 = new Task(() => {
-				Console.WriteLine("Task 1 start");
+				Console.Write("Task 1 start");
+				PrintCurrentThread();
 				Thread.Sleep(1000);
-				Console.WriteLine("Task 1 end");
+				Console.Write("Task 1 end");
+				PrintCurrentThread();
 			});
 			t1.Start();
 
 			Console.WriteLine("Press any key to exit...");
 			Console.ReadKey(true);
+		}
+
+		/// <summary>
+		/// Выводит в текущую строку консоли номер потока.
+		/// </summary>
+		public static void PrintCurrentThread() {
+			string tStr = new string($"(thread {Thread.CurrentThread.ManagedThreadId:D2})");
+			Console.CursorLeft = Console.WindowWidth - tStr.Length;
+			Console.ForegroundColor = ConsoleColor.DarkBlue;
+			Console.WriteLine(tStr);
+			Console.ResetColor();
 		}
 	}
 
