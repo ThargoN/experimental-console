@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 //---------------------------------------------------------------------------
 // Experimental console
@@ -15,7 +18,15 @@ namespace Thargon.Experimental_console {
 
 	class Program {
 		static void Main() {
-			Console.WriteLine("Hello World!");
+			var t1 = new Task(() => {
+				Console.WriteLine("Task 1 start");
+				Thread.Sleep(1000);
+				Console.WriteLine("Task 1 end");
+			});
+			t1.Start();
+
+			Console.WriteLine("Press any key to exit...");
+			Console.ReadKey(true);
 		}
 	}
 
