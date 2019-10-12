@@ -21,11 +21,17 @@ namespace Thargon.Experimental_console {
 			Console.WriteLine("Starting console");
 			PrintCurrentThread();
 
-			Task.Factory.StartNew(() => DoJob(1, 2500));
-			Task.Factory.StartNew(() => DoJob(2, 750));
-			Task.Factory.StartNew(() => DoJob(3, 3000));
-			Task.Factory.StartNew(() => DoJob(4, 2500));
-			Task.Factory.StartNew(() => DoJob(5, 1000));
+			var t1 = Task.Factory.StartNew(() => DoJob(1, 2500)).ContinueWith((prevTask) => { 
+				Console.WriteLine("FIRST JOB COMPLETED!");
+				PrintCurrentThread();
+			});
+			var t2 = Task.Factory.StartNew(() => DoJob(2, 750));
+			var t3 = Task.Factory.StartNew(() => DoJob(3, 3000));
+			var t4 = Task.Factory.StartNew(() => DoJob(4, 2500));
+			var t5 = Task.Factory.StartNew(() => DoJob(5, 1000));
+
+			var taskList = new List<Task> { t1, t2, t3, t4, t5 };
+			Task.WaitAll(taskList.ToArray());
 
 			Console.WriteLine("Press any key to exit...");
 			Console.ReadKey(true);
@@ -52,7 +58,7 @@ namespace Thargon.Experimental_console {
 		/// </summary>
 		public static void PrintCurrentThread() {
 			string tStr = new string($"(thread {Thread.CurrentThread.ManagedThreadId:D2})");
-			Console.SetCursorPosition(Console.WindowWidth - tStr.Length, Math.Max(Console.CursorTop - 1, 0));
+			Console.SetCursorPosition(Console.WindowWidth - tStr.Length - 1, Math.Max(Console.CursorTop - 1, 0));
 			Console.ForegroundColor = ConsoleColor.DarkBlue;
 			Console.WriteLine(tStr);
 			Console.ResetColor();
